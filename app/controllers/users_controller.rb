@@ -6,6 +6,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
+      sign_in @user
       flash.now[:success] = "Welcome to the Sample App!"
       render 'show'
     else
