@@ -216,5 +216,15 @@ describe User do
       subject { other_user }
       its(:followers) { should include(@user) }
     end
+
+    it "should destroy associated relationships" do
+      relationships = @user.relationships.dup
+      @user.destroy
+      relationships.each do |relationship|
+        Relationship.where('follower_id = ? and followed_id = ?',
+                           relationship.follower_id,
+                           relationship.followed_id).should be_empty
+      end
+    end
   end
 end
