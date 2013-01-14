@@ -25,10 +25,33 @@ describe "Static pages" do
         visit root_path
       end
 
+      it "should display correct number of feed items" do
+        should have_content(user.feed.count)
+      end
+
       it "should render the user's feed" do
         user.feed.each do |item|
-          page.should have_selector("li##{item.id}", text: item.content)
+          should have_selector("li##{item.id}", text: item.content)
         end
+      end
+    end
+
+    describe "pagination" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do 
+        31.times { FactoryGirl.create(:micropost, user: user) }
+        sign_in user
+        visit root_path
+      end
+      it { should have_selector('div.pagination') }
+      it "should display first 30 items" do
+        user.feed[0..29].each do |item|
+          should have_selector("li##{item.id}", text: item.content)
+        end
+      end
+      it "should not display 31st item" do
+        item = user.feed[30]
+        should_not have_selector("li##{item.id}", text: item.content)
       end
     end
   end
